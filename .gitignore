@@ -1,0 +1,45 @@
+# IntelliJ Idea
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Maven
+target/
+overlays/
+.m2/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+*.out
+*.pid
+
+# Git
+*.orig
+*.rej
+
+# Mac OS
+.DS_Store
+
+# Emacs
+*~
+
+# Jenkins
+.repository
+
+# TeX
+*.aux
+*.lof
+*.toc
+
+
+# (Custom) dev envs
+.env
+.envrc
+/tmp/
+**/src/*/resources/config/application-*.properties
