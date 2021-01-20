@@ -61,6 +61,7 @@ public class AkeneoAuthenticator implements ClientHttpRequestInterceptor {
   public ClientHttpResponse intercept(HttpRequest request,
                                       byte[] body,
                                       ClientHttpRequestExecution execution) throws IOException {
+    LOG.info("{} - {}", request.getMethod().toString(), request.getURI().toString());
     request.getHeaders().setBearerAuth(getOAuthToken().getAccessToken());
     return execution.execute(request, body);
   }

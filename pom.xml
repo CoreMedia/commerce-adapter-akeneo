@@ -18,8 +18,8 @@
   <packaging>pom</packaging>
 
   <modules>
-<!--    <module>adapter-akeneo</module>-->
-<!--    <module>adapter-akeneo-app</module>-->
+    <module>adapter-akeneo</module>
+    <module>adapter-akeneo-app</module>
     <module>adapter-akeneo-lib</module>
     <module>adapter-akeneo-parent</module>
   </modules>

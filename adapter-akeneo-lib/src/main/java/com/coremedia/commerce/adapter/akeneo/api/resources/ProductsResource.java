@@ -6,17 +6,19 @@ import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
 import com.coremedia.commerce.adapter.akeneo.api.utils.FilterBuilder;
 import com.google.common.collect.ImmutableMap;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ProductResource extends AbstractAkeneoApiResource {
+@Service("akeneoProductsResource")
+public class ProductsResource extends AbstractAkeneoApiResource {
 
   private static final String PRODUCTS_PATH = "/products";
   private static final String PRODUCT_BY_CODE_PATH = PRODUCTS_PATH + "/{" + CODE_PARAM + "}";
 
-  public ProductResource(AkeneoApiConnector connector) {
+  public ProductsResource(AkeneoApiConnector connector) {
     super(connector);
   }
 

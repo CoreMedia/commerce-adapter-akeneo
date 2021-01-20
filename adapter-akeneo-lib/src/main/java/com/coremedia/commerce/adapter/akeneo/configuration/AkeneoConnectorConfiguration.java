@@ -4,7 +4,6 @@ import com.coremedia.commerce.adapter.akeneo.AkeneoApiConnector;
 import com.coremedia.commerce.adapter.akeneo.oauth.AkeneoAuthenticator;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.util.CollectionUtils;

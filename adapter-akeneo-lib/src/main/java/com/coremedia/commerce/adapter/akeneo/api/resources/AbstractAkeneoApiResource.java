@@ -2,14 +2,9 @@ package com.coremedia.commerce.adapter.akeneo.api.resources;
 
 import com.coremedia.commerce.adapter.akeneo.AkeneoApiConnector;
 import com.coremedia.commerce.adapter.akeneo.api.entities.AbstractEntity;
-import com.coremedia.commerce.adapter.akeneo.api.entities.CategoryEntity;
-import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedCategoriesEntity;
 import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedEntity;
-import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedProductsEntity;
-import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,15 +41,15 @@ public abstract class AbstractAkeneoApiResource {
     this.connector = connector;
   }
 
-  protected <S extends PaginatedEntity<T>,T extends AbstractEntity> List<T> performSearch(String resourcePath, Class<S> paginationType) {
+  protected <S extends PaginatedEntity<T>, T extends AbstractEntity> List<T> performSearch(String resourcePath, Class<S> paginationType) {
     return performSearch(resourcePath, null, paginationType);
   }
 
-  protected <S extends PaginatedEntity<T>,T extends AbstractEntity> List<T> performSearch(String resourcePath, Filter filter, Class<S> paginationType) {
+  protected <S extends PaginatedEntity<T>, T extends AbstractEntity> List<T> performSearch(String resourcePath, Filter filter, Class<S> paginationType) {
     List<T> results = new ArrayList<>();
 
     ListMultimap<String, String> queryParams = ArrayListMultimap.create();
-    queryParams.put(LIMIT, MAX_LIMIT);
+    queryParams.put(LIMIT, DEFAULT_LIMIT);
 
     if (filter != null) {
       queryParams.put(SEARCH, filter.toString());

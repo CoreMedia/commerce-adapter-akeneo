@@ -1,8 +1,7 @@
 package com.coremedia.commerce.adpater.akeneo.api.resources;
 
 import com.coremedia.commerce.adapter.akeneo.api.entities.CategoryEntity;
-import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedCategoriesEntity;
-import com.coremedia.commerce.adapter.akeneo.api.resources.CategoryResource;
+import com.coremedia.commerce.adapter.akeneo.api.resources.CategoriesResource;
 import com.coremedia.commerce.adapter.akeneo.configuration.AkeneoConnectorConfiguration;
 import com.coremedia.commerce.adpater.akeneo.AbstractAkeneoApiIT;
 import org.junit.Test;
@@ -19,29 +18,29 @@ import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(classes = {
         AkeneoConnectorConfiguration.class,
-        CategoryResource.class
+        CategoriesResource.class
 })
-public class CategoryResourceIT extends AbstractAkeneoApiIT {
+public class CategoriesResourceIT extends AbstractAkeneoApiIT {
 
   @Autowired
-  private CategoryResource categoryResource;
+  private CategoriesResource categoriesResource;
 
   @Test
   public void testGetRootCategory() {
-    Optional<CategoryEntity> master = categoryResource.getCategoryByCode("master");
+    Optional<CategoryEntity> master = categoriesResource.getCategoryByCode("master");
     assertTrue(master.isPresent());
   }
 
   @Test
   public void testListCategories() {
-    List<CategoryEntity> categoryList = categoryResource.listCategories();
+    List<CategoryEntity> categoryList = categoriesResource.listCategories();
     assertNotNull(categoryList);
     assertEquals("Expected number of categories does not match.", 168, categoryList.size());
   }
 
   @Test
   public void testGetChildCategories() {
-    List<CategoryEntity> children = categoryResource.getChildCategories("master");
+    List<CategoryEntity> children = categoriesResource.getChildCategories("master");
     assertNotNull(children);
     assertEquals(9, children.size());
   }

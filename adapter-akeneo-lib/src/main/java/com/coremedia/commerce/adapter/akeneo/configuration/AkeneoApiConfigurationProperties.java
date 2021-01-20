@@ -1,7 +1,9 @@
 package com.coremedia.commerce.adapter.akeneo.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Locale;
 
 @ConfigurationProperties(prefix = "akeneo.api")
 public class AkeneoApiConfigurationProperties {
@@ -35,6 +37,10 @@ public class AkeneoApiConfigurationProperties {
   private String clientSecret;
   private String username;
   private String password;
+
+  private Locale defaultLocale = Locale.US;
+
+  private String mediaCachePath = "/media/cache";
 
   public String getProtocol() {
     return protocol;
@@ -107,4 +113,25 @@ public class AkeneoApiConfigurationProperties {
   public void setPassword(String password) {
     this.password = password;
   }
+
+  public Locale getDefaultLocale() {
+    return defaultLocale;
+  }
+
+  public void setDefaultLocale(Locale defaultLocale) {
+    this.defaultLocale = defaultLocale;
+  }
+
+  public String getMediaCachePath() {
+    return mediaCachePath;
+  }
+
+  public void setMediaCachePath(String mediaCachePath) {
+    this.mediaCachePath = mediaCachePath;
+  }
+
+  public String getMediaEndpoint() {
+    return UriComponentsBuilder.newInstance().scheme(protocol).host(host).port(port).path(mediaCachePath).build().toString();
+  }
+
 }

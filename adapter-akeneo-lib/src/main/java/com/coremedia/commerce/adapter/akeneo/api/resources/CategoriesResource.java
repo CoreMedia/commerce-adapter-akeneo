@@ -5,25 +5,21 @@ import com.coremedia.commerce.adapter.akeneo.api.entities.CategoryEntity;
 import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedCategoriesEntity;
 import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
 import com.coremedia.commerce.adapter.akeneo.api.utils.FilterBuilder;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ListMultimap;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
-public class CategoryResource extends AbstractAkeneoApiResource {
+@Service("akeneoCategoriesResource")
+public class CategoriesResource extends AbstractAkeneoApiResource {
 
   private static final String CATEGORIES_PATH = "/categories";
   private static final String CATEGORY_BY_CODE_PATH = CATEGORIES_PATH + "/{" + CODE_PARAM + "}";
 
-  public CategoryResource(AkeneoApiConnector connector) {
+  public CategoriesResource(AkeneoApiConnector connector) {
     super(connector);
   }
 

@@ -1,8 +1,17 @@
 package com.coremedia.commerce.adapter.akeneo.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ProductEntity extends AbstractEntity {
 
@@ -43,7 +52,7 @@ public class ProductEntity extends AbstractEntity {
   private String parent;
 
   @JsonProperty("values")
-  private Map<String, Object> values;
+  private Map<String, List<ProductAttributeEntity>> values;
 
   @JsonProperty("associations")
   private Map<String, Object> associations;
@@ -114,11 +123,11 @@ public class ProductEntity extends AbstractEntity {
     this.parent = parent;
   }
 
-  public Map<String, Object> getValues() {
+  public Map<String, List<ProductAttributeEntity>> getValues() {
     return values;
   }
 
-  public void setValues(Map<String, Object> values) {
+  public void setValues(Map<String, List<ProductAttributeEntity>> values) {
     this.values = values;
   }
 
@@ -161,4 +170,57 @@ public class ProductEntity extends AbstractEntity {
   public void setMetadata(Map<String, Object> metadata) {
     this.metadata = metadata;
   }
+
+  public <T> Optional<T> getValueForKey(String key, Class<T> expectedType) {
+    return Optional.of(values)
+            .map(v -> v.get(key))
+            .map(list -> list.get(0))
+            .map(ProductAttributeEntity::getData)
+            .filter(d -> d.getClass().isAssignableFrom(expectedType))
+            .map(expectedType::cast);
+  }
+
+  public <T> Optional<T> getLocalizedValue(String key, Locale targetLocale, Class<T> expectedType) {
+    String localeKey = targetLocale.getLanguage() + "_" + targetLocale.getCountry();
+
+    return Optional.of(values)
+            .map(v -> v.get(key)).flatMap(list -> list.stream()
+                    .filter(localizedValue -> localeKey.equals(localizedValue.getLocale()))
+                    .findFirst()).map(ProductAttributeEntity::getData)
+            .filter(d -> d.getClass().isAssignableFrom(expectedType))
+            .map(expectedType::cast);
+  }
+
+  @JsonIgnore
+  public String getName() {
+    return getValueForKey("variation_name", String.class)
+            .or(() -> getValueForKey("name", String.class))
+            .orElse(identifier);
+  }
+
+  @JsonIgnore
+  public Optional<String> getImage() {
+    return getValueForKey("variation_image", String.class)
+            .or(() -> getValueForKey("image", String.class))
+            .or(() -> getValueForKey("picture", String.class));
+  }
+
+  @JsonIgnore
+  public Map<String, String> getPrices() {
+    Map<String, String> result = new HashMap<>();
+
+    Optional<ArrayList> prices = getValueForKey("price", ArrayList.class);
+    if (prices.isPresent()) {
+      ArrayList list = prices.get();
+      list.stream().forEach(p -> {
+        HashMap<String, String> price = (HashMap<String, String>) p;
+        String currency = price.get("currency");
+        String amount = price.get("amount");
+        result.put(currency, amount);
+      });
+    }
+
+    return result;
+  }
+
 }

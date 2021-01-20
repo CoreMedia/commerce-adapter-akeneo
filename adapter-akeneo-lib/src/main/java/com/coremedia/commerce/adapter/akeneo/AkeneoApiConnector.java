@@ -2,6 +2,7 @@ package com.coremedia.commerce.adapter.akeneo;
 
 import com.coremedia.commerce.adapter.akeneo.configuration.AkeneoApiConfigurationProperties;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -19,10 +20,19 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +43,6 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.nullToEmpty;
 
-@Service
 public class AkeneoApiConnector {
 
   private static final Logger LOG = LoggerFactory.getLogger(AkeneoApiConnector.class);
@@ -71,14 +80,30 @@ public class AkeneoApiConnector {
   }
 
   public <T> Optional<T> getResourceByPaginationUrl(String absoluteResourcePageUrl, Class<T> responseType) {
-    return getResource(absoluteResourcePageUrl, Collections.emptyMap(), ImmutableListMultimap.of(), responseType, true);
+    try {
+      MultiValueMap<String, String> rawParams = UriComponentsBuilder.fromUriString(absoluteResourcePageUrl).build().getQueryParams();
+      ListMultimap<String, String> queryParams = ArrayListMultimap.create();
+
+      // Need to decode parameters here to avoid double encoding
+      rawParams.toSingleValueMap().forEach((key, value) -> {
+        String decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
+        queryParams.put(key, decodedValue);
+      });
+
+      String url = UriComponentsBuilder.fromUriString(absoluteResourcePageUrl).replaceQuery(null).build().toString();
+      return getResource(url, Collections.emptyMap(), queryParams, responseType, true);
+
+    } catch (Exception e) {
+      LOG.error("Unable to fetch paginated resource.", e);
+      return Optional.empty();
+    }
   }
 
   public <T> Optional<T> getResource(String resourcePath, Map<String, String> pathParams,
                                      ListMultimap<String, String> queryParams, Class<T> responseType, boolean isPaginatedPageRequest) {
     requireNonEmptyResourcePath(resourcePath);
 
-    String url = isPaginatedPageRequest ? resourcePath : buildRequestTemplateUrl(resourcePath, queryParams.keySet());
+    String url = buildRequestTemplateUrl(resourcePath, queryParams.keySet(), isPaginatedPageRequest);
     HttpEntity<String> requestEntity = new HttpEntity<>(buildHttpHeaders());
     Map<String, String> urlParams = mergeUrlParams(pathParams, queryParams);
 
@@ -98,7 +123,7 @@ public class AkeneoApiConnector {
                                       Class<T> responseType) {
     requireNonEmptyResourcePath(resourcePath);
 
-    String url = buildRequestTemplateUrl(resourcePath, queryParams.keySet());
+    String url = buildRequestTemplateUrl(resourcePath, queryParams.keySet(), false);
     HttpEntity<String> requestEntity = new HttpEntity<>(nullToEmpty(requestBody), buildHttpHeaders());
     Map<String, String> urlParams = mergeUrlParams(pathParams, queryParams);
 
@@ -111,23 +136,28 @@ public class AkeneoApiConnector {
   }
 
   @VisibleForTesting
-  String buildRequestTemplateUrl(String resourcePath, Set<String> queryParamNames) {
+  String buildRequestTemplateUrl(String resourcePath, Set<String> queryParamNames, boolean isPaginatedPageRequest) {
 
+    UriComponentsBuilder uriBuilder;
 
-    UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
-            .scheme(protocol)
-            .host(host)
-            .port(port)
-            .path(basePath);
+    if (isPaginatedPageRequest) {
+      uriBuilder = UriComponentsBuilder.fromUriString(resourcePath);
+    } else {
+      uriBuilder = UriComponentsBuilder.newInstance()
+              .scheme(protocol)
+              .host(host)
+              .port(port)
+              .path(basePath);
 
-    // Append API version.
-    String apiVersionPathSegment = apiVersion;
-    if (StringUtils.isNotBlank(apiVersionPathSegment)) {
-      uriBuilder.pathSegment(apiVersionPathSegment);
+      // Append API version.
+      String apiVersionPathSegment = apiVersion;
+      if (StringUtils.isNotBlank(apiVersionPathSegment)) {
+        uriBuilder.pathSegment(apiVersionPathSegment);
+      }
+
+      // Append resource path.
+      uriBuilder.path(resourcePath);
     }
-
-    // Append resource path.
-    uriBuilder.path(resourcePath);
 
     // Append template query parameters.
     getDefaultQueryParams().keySet().forEach(name -> uriBuilder.queryParam(name, "{" + name + "}"));
