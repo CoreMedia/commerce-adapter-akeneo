@@ -70,6 +70,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     ExternalId parentCategoryId = ExternalId.of(parentCode);
     ProductBuilder productBuilder = Product.builder(id, name, parentCategoryId);
 
+    // Add currency
+    entityQuery.getCurrency().ifPresent(currency -> productBuilder.setCurrencyCode(currency.getCurrencyCode()));
+
     // Add description
     productEntity.getLocalizedValue("description", locale, String.class)
             .ifPresent(description -> {

@@ -35,15 +35,15 @@ public class PriceRepositoryImpl implements PriceRepository {
     ImmutableList.Builder<Price> builder = ImmutableList.builder();
 
     String productCode = idQuery.getId().getValue();
-    Currency currency = idQuery.getCurrency().orElseThrow(IllegalArgumentException::new);
     Optional<ProductEntity> productEntity = productsResource.getProductByCode(productCode);
-    productEntity.map(ProductEntity::getPrices)
-            .map(prices -> prices.get(currency.getCurrencyCode()))
-            .map(priceValue -> new BigDecimal(priceValue))
-            .ifPresent(value -> {
-              builder.add(new Price(value, LIST, currency));
-              builder.add(new Price(value, OFFER, currency));
-            });
+    productEntity.map(ProductEntity::getPrices).ifPresent(prices -> {
+      prices.forEach((currencyCode, amount) -> {
+        BigDecimal value = new BigDecimal(amount);
+        Currency currency = Currency.getInstance(currencyCode);
+        builder.add(new Price(value, LIST, currency));
+        builder.add(new Price(value, OFFER, currency));
+      });
+    });
 
     return builder.build();
   }
