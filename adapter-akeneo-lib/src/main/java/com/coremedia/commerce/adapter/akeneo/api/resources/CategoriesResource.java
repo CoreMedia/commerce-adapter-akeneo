@@ -6,6 +6,7 @@ import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedCategoriesEnt
 import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
 import com.coremedia.commerce.adapter.akeneo.api.utils.FilterBuilder;
 import com.google.common.collect.ImmutableMap;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class CategoriesResource extends AbstractAkeneoApiResource {
     super(connector);
   }
 
+  @Cacheable("categories")
   public Optional<CategoryEntity> getCategoryByCode(String code) {
     Map<String, String> pathParameters = ImmutableMap.of(CODE_PARAM, code);
     return connector.getResource(CATEGORY_BY_CODE_PATH, pathParameters, CategoryEntity.class);
@@ -38,6 +40,7 @@ public class CategoriesResource extends AbstractAkeneoApiResource {
    * @param parentCode
    * @return
    */
+  @Cacheable("childCategories")
   public List<CategoryEntity> getChildCategories(String parentCode) {
     Filter filterByParentCategoryFilter = FilterBuilder.newInstance()
             .onProperty("parent")

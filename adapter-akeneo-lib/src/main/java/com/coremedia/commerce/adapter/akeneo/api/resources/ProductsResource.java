@@ -6,6 +6,7 @@ import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
 import com.coremedia.commerce.adapter.akeneo.api.utils.FilterBuilder;
 import com.google.common.collect.ImmutableMap;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +23,13 @@ public class ProductsResource extends AbstractAkeneoApiResource {
     super(connector);
   }
 
+  @Cacheable("products")
   public Optional<ProductEntity> getProductByCode(String code) {
     Map<String, String> pathParameters = ImmutableMap.of(CODE_PARAM, code);
     return connector.getResource(PRODUCT_BY_CODE_PATH, pathParameters, ProductEntity.class);
   }
 
+  @Cacheable("productsInCategory")
   public List<ProductEntity> getProductsInCategory(String categoryCode) {
     Filter filterProductsByParentCategoryFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.IN).withValue(List.of(categoryCode)).build();
     return searchProducts(filterProductsByParentCategoryFilter);
