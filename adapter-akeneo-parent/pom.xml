@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>com.coremedia.commerce.adapter.base</groupId>
     <artifactId>adapter-parent</artifactId>
-    <version>1.4.5</version>
+    <version>2.2.3</version>
     <relativePath/>
   </parent>
 
   <groupId>com.coremedia.commerce.adapter.akeneo</groupId>
   <artifactId>adapter-akeneo-parent</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -23,10 +21,11 @@
 
     <!-- dependency versions (and groupIds)-->
     <adapter.base.groupId>com.coremedia.commerce.adapter.base</adapter.base.groupId>
-    <adapter.base.version>1.4.5</adapter.base.version>
-    <cms.version>2010.2</cms.version>
-    <commons.collections4.version>4.2</commons.collections4.version>
-    <json.version>20140107</json.version>
+    <adapter.base.version>2.2.3</adapter.base.version>
+    <cms.version>2307.1</cms.version>
+    <commons.collections4.version>4.4</commons.collections4.version>
+    <json.version>20230227</json.version>
+    <caffeine.version>3.1.6</caffeine.version>
   </properties>
 
   <dependencyManagement>
@@ -66,6 +65,11 @@
             <artifactId>validation-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.github.ben-manes.caffeine</groupId>
+        <artifactId>caffeine</artifactId>
+        <version>${caffeine.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>

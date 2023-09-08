@@ -4,6 +4,7 @@ import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.resources.ProductsResource;
 import com.coremedia.commerce.adapter.base.entities.IdQuery;
 import com.coremedia.commerce.adapter.base.entities.Price;
+import com.coremedia.commerce.adapter.base.entities.PriceBuilder;
 import com.coremedia.commerce.adapter.base.entities.UserContext;
 import com.coremedia.commerce.adapter.base.repositories.PriceRepository;
 import com.google.common.collect.ImmutableList;
@@ -17,8 +18,8 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 
-import static com.coremedia.commerce.adapter.base.entities.PriceTypes.LIST;
-import static com.coremedia.commerce.adapter.base.entities.PriceTypes.OFFER;
+import static com.coremedia.commerce.adapter.base.entities.PriceType.LIST;
+import static com.coremedia.commerce.adapter.base.entities.PriceType.OFFER;
 
 @DefaultAnnotation(NonNull.class)
 @Repository
@@ -40,8 +41,8 @@ public class PriceRepositoryImpl implements PriceRepository {
       prices.forEach((currencyCode, amount) -> {
         BigDecimal value = new BigDecimal(amount);
         Currency currency = Currency.getInstance(currencyCode);
-        builder.add(new Price(value, LIST, currency));
-        builder.add(new Price(value, OFFER, currency));
+        builder.add(Price.builder(value, LIST, currency).build());
+        builder.add(Price.builder(value, OFFER, currency).build());
       });
     });
 

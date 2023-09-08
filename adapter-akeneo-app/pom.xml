@@ -5,39 +5,41 @@
   <parent>
     <groupId>com.coremedia.commerce.adapter.akeneo</groupId>
     <artifactId>adapter-akeneo-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <relativePath>../adapter-akeneo-parent</relativePath>
   </parent>
 
   <artifactId>adapter-akeneo-app</artifactId>
+
+  <properties>
+    <application.java.heap>64m</application.java.heap>
+    <start-class>com.coremedia.commerce.adapter.akeneo.AkeneoConnectorApplication</start-class>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>adapter-akeneo-lib</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <scope>provided</scope>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-autoconfigure</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <scope>provided</scope>
+      <scope>runtime</scope>
       <exclusions>
         <exclusion>
           <groupId>javax.annotation</groupId>
@@ -47,38 +49,25 @@
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>coremedia.external.releases</id>
+      <name>CoreMedia CMS</name>
+      <url>https://repository.coremedia.com/nexus/content/groups/cms/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
   <build>
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-banned-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <phase>validate</phase>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>*:*</exclude>
-                  </excludes>
-                  <includes>
-                    <!-- include only provided and test scope  to support spring-boot-maven-plugin -->
-                    <include>*:*:*:*:provided</include>
-                    <include>*:*:*:*:test</include>
-                    <!-- also include known optional deps -->
-                    <include>org.springframework.boot:spring-boot-configuration-processor</include>
-                  </includes>
-                </bannedDependencies>
-              </rules>
-              <fail>true</fail>
-            </configuration>
-          </execution>
-        </executions>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <!-- For customizations see https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin -->
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>

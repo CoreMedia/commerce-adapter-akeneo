@@ -10,7 +10,6 @@ import com.coremedia.commerce.adapter.base.entities.Product;
 import com.coremedia.commerce.adapter.base.entities.ProductBuilder;
 import com.coremedia.commerce.adapter.base.entities.SearchQuery;
 import com.coremedia.commerce.adapter.base.entities.SearchResult;
-import com.coremedia.commerce.adapter.base.entities.SearchResultFacet;
 import com.coremedia.commerce.adapter.base.repositories.ProductRepository;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -46,11 +44,6 @@ public class ProductRepositoryImpl implements ProductRepository {
   public Optional<Product> getProductById(IdQuery idQuery) {
     return productsResource.getProductByCode(idQuery.getId().getValue())
             .map(productEntity -> toProduct(productEntity, idQuery));
-  }
-
-  @Override
-  public List<SearchResultFacet> getFacetsForProductSearch(IdQuery idQuery) {
-    return null;
   }
 
   @Override
