@@ -1,6 +1,7 @@
 package com.coremedia.commerce.adapter.akeneo;
 
 import com.coremedia.commerce.adapter.akeneo.configuration.AkeneoApiConfigurationProperties;
+import com.coremedia.commerce.adapter.akeneo.oauth.AkeneoAuthenticator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
@@ -42,14 +43,17 @@ public class AkeneoApiConnector {
   private final String basePath;
   private final String apiVersion;
   private final RestTemplate restTemplate;
+  private final AkeneoAuthenticator authenticator;
 
   public AkeneoApiConnector(AkeneoApiConfigurationProperties properties,
+                            AkeneoAuthenticator authenticator,
                             RestTemplate restTemplate) {
     this.protocol = properties.getProtocol();
     this.host = properties.getHost();
     this.port = properties.getPort();
     this.basePath = properties.getBasePath();
     this.apiVersion = properties.getVersion();
+    this.authenticator = authenticator;
     this.restTemplate = restTemplate;
   }
 
@@ -177,8 +181,8 @@ public class AkeneoApiConnector {
           return Optional.ofNullable(responseEntity.getBody());
         }
         default: {
-          throw new RuntimeException(
-                  String.format("REST call to '%s' with params '%s' failed. Exception: %s", url, urlParams, ex.getMessage()), ex);
+          LOG.error("REST call to '{}' with params '{}' failed. Exception: {}", url, urlParams, ex.getMessage(), ex);
+          return Optional.empty();
         }
       }
     }
@@ -203,7 +207,9 @@ public class AkeneoApiConnector {
   }
 
   public void invalidateAccessToken() {
-
+    if (authenticator != null) {
+      authenticator.refreshToken();
+    }
   };
 
 }

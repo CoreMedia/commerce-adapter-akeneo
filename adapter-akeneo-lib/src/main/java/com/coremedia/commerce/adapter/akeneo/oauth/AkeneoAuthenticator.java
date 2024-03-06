@@ -51,10 +51,15 @@ public class AkeneoAuthenticator implements ClientHttpRequestInterceptor {
   }
 
   public AccessToken getOAuthToken() {
-    if (token == null) {
+    if (token == null || token.isExpired()) {
       token = requestNewToken();
     }
     return token;
+  }
+
+  public AccessToken refreshToken() {
+    token = null;
+    return getOAuthToken();
   }
 
   @Override

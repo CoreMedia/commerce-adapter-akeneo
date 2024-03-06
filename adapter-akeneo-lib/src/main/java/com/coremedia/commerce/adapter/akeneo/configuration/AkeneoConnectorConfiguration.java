@@ -19,8 +19,10 @@ import java.util.List;
 public class AkeneoConnectorConfiguration {
 
   @Bean
-  public AkeneoApiConnector akeneoApiConnector(AkeneoApiConfigurationProperties properties, RestTemplate restTemplate) {
-    return new AkeneoApiConnector(properties, restTemplate);
+  public AkeneoApiConnector akeneoApiConnector(AkeneoApiConfigurationProperties properties,
+                                               AkeneoAuthenticator authenticator,
+                                               RestTemplate restTemplate) {
+    return new AkeneoApiConnector(properties, authenticator, restTemplate);
   }
 
   @Bean
