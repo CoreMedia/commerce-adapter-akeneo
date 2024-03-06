@@ -210,6 +210,6 @@ public class AkeneoApiConnector {
     if (authenticator != null) {
       authenticator.refreshToken();
     }
-  };
+  }
 
 }
