@@ -2,9 +2,12 @@ package com.coremedia.commerce.adapter.akeneo.repositories;
 
 import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.resources.ProductsResource;
+import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
+import com.coremedia.commerce.adapter.akeneo.api.utils.FilterBuilder;
 import com.coremedia.commerce.adapter.akeneo.configuration.AkeneoApiConfigurationProperties;
 import com.coremedia.commerce.adapter.base.entities.EntityQuery;
 import com.coremedia.commerce.adapter.base.entities.ExternalId;
+import com.coremedia.commerce.adapter.base.entities.Id;
 import com.coremedia.commerce.adapter.base.entities.IdQuery;
 import com.coremedia.commerce.adapter.base.entities.Product;
 import com.coremedia.commerce.adapter.base.entities.ProductBuilder;
@@ -17,9 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static com.coremedia.commerce.adapter.akeneo.api.utils.Filter.Operator.CONTAINS;
 import static java.lang.invoke.MethodHandles.lookup;
 
 @DefaultAnnotation(NonNull.class)
@@ -42,13 +48,37 @@ public class ProductRepositoryImpl implements ProductRepository {
 
   @Override
   public Optional<Product> getProductById(IdQuery idQuery) {
-    return productsResource.getProductByCode(idQuery.getId().getValue())
+    LOG.debug("Fetching product by id query: {}", idQuery);
+    Optional<Product> product = productsResource.getProductByCode(idQuery.getId().getValue())
             .map(productEntity -> toProduct(productEntity, idQuery));
+    if (LOG.isDebugEnabled()) {
+      if (product.isPresent()) {
+        LOG.debug("Found product for id query: {} -> {}", idQuery, product.get());
+      } else {
+        LOG.debug("No product found for id query: {}", idQuery);
+      }
+    }
+    return product;
   }
 
   @Override
   public SearchResult search(SearchQuery searchQuery) {
-    return null;
+    LOG.debug("Searching products for search query: {}", searchQuery);
+    Filter searchFilter = FilterBuilder.newInstance().onProperty("name").withOperator(CONTAINS).withValue(searchQuery.getSearchTerm()).build();
+    List<ProductEntity> productEntities = productsResource.searchProducts(searchFilter);
+    List<Id> productIds = productEntities.stream()
+            .map(ProductEntity::getIdentifier)
+            .map(ExternalId::of)
+            .collect(Collectors.toList());
+    SearchResult result = SearchResult.builder().setTotalCount(productEntities.size()).setEntityIds(productIds).build();
+    if (LOG.isDebugEnabled()) {
+      if (result.getTotalCount() > 0) {
+        LOG.debug("Found {} products for search query: {}", result.getTotalCount(), searchQuery);
+      } else {
+        LOG.debug("No products found for search for search query: {}", searchQuery);
+      }
+    }
+    return result;
   }
 
 

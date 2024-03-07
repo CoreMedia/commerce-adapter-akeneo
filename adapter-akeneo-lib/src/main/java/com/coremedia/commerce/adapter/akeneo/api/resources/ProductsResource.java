@@ -6,6 +6,7 @@ import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.utils.Filter;
 import com.coremedia.commerce.adapter.akeneo.api.utils.FilterBuilder;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,17 @@ public class ProductsResource extends AbstractAkeneoApiResource {
 
   @Cacheable("productsInCategory")
   public List<ProductEntity> getProductsInCategory(String categoryCode) {
-    Filter filterProductsByParentCategoryFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.IN).withValue(List.of(categoryCode)).build();
-    return searchProducts(filterProductsByParentCategoryFilter);
+
+    Filter searchFilter;
+    if (StringUtils.isBlank(categoryCode)) {
+      // Get unclassified products
+      searchFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.UNCLASSIFIED).build();
+    } else {
+      // Filter products by categories classification
+      searchFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.IN).withValue(List.of(categoryCode)).build();
+    }
+
+    return searchProducts(searchFilter);
   }
 
   public List<ProductEntity> searchProducts(Filter filter) {

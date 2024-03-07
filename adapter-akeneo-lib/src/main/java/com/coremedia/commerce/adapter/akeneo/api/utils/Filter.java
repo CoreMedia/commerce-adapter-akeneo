@@ -28,7 +28,11 @@ public class Filter {
     UNCLASSIFIED("UNCLASSIFIED"),
 
     EQUALS("="),
-    NOT_EQUALS("!=");
+    NOT_EQUALS("!="),
+
+    STARTS_WITH("START WITH"),
+    CONTAINS("CONTAINS"),
+    DOES_NOT_CONTAIN("DOES NOT CONTAIN");
 
     private String label;
 

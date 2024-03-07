@@ -22,9 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -35,8 +38,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
   private static final Logger LOG = LoggerFactory.getLogger(lookup().lookupClass());
 
-  private CategoriesResource categoriesResource;
-  private ProductsResource productsResource;
+  private final CategoriesResource categoriesResource;
+  private final ProductsResource productsResource;
   private final Locale defaultLocale;
 
   public CategoryRepositoryImpl(CategoriesResource categoriesResource, ProductsResource productsResource, AkeneoApiConfigurationProperties properties) {
@@ -47,19 +50,38 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
   @Override
   public Optional<Category> getCategoryById(IdQuery idQuery) {
-    return categoriesResource.getCategoryByCode(idQuery.getId().getValue())
+    LOG.debug("Fetching category by id query: {}", idQuery);
+    Optional<Category> category = categoriesResource.getCategoryByCode(idQuery.getId().getValue())
             .map(entity -> toCategory(entity, idQuery));
+    if (LOG.isDebugEnabled()) {
+      if (category.isPresent()) {
+        LOG.debug("Found category for id query: {} -> {}", idQuery, category.get());
+      } else {
+        LOG.debug("No category found for id query: {}", idQuery);
+      }
+    }
+    return category;
   }
 
   @Override
   public Optional<Category> getCategoryBySeoSegment(SeoSegmentQuery seoSegmentQuery) {
-    return categoriesResource.getCategoryByCode(seoSegmentQuery.getSeoSegment())
+    LOG.debug("Fetching category by seo segment query: {}", seoSegmentQuery);
+    Optional<Category> category = categoriesResource.getCategoryByCode(seoSegmentQuery.getSeoSegment())
             .map(entity -> toCategory(entity, seoSegmentQuery));
+    if (LOG.isDebugEnabled()) {
+      if (category.isPresent()) {
+        LOG.debug("Found category for seo segment query: {} -> {}", seoSegmentQuery, category.get());
+      } else {
+        LOG.debug("No category found for seo segment query: {}", seoSegmentQuery);
+      }
+    }
+    return category;
   }
 
   @Override
   public Iterable<Category> getCategories(EntityParams entityParams) {
-    return null;
+    // NOTE: Method is currently unused
+    return Collections.emptyList();
   }
 
   private Category toCategory(CategoryEntity categoryEntity, EntityQuery entityQuery) {
@@ -91,11 +113,22 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     categoryBuilder.setChildIds(childIds);
 
     // Add assigned products
-    List<Id> assignedProductIds = productsResource.getProductsInCategory(categoryCode).stream()
+    Set<Id> productIds = productsResource.getProductsInCategory(categoryCode).stream()
             .map(ProductEntity::getIdentifier)
             .map(ExternalId::of)
-            .collect(Collectors.toList());
-    categoryBuilder.setProductIds(assignedProductIds);
+            .collect(Collectors.toSet());
+
+    if (StringUtils.isBlank(categoryEntity.getParent())) {
+      // no parent category so also add all unclassified products to this root category
+      Set<Id> unclassifiedProductIds = productsResource.getProductsInCategory(null).stream()
+              .map(ProductEntity::getIdentifier)
+              .map(ExternalId::of)
+              .collect(Collectors.toSet());
+
+      productIds.addAll(unclassifiedProductIds);
+    }
+
+    categoryBuilder.setProductIds(new ArrayList<>(productIds));
 
     return categoryBuilder.build();
   }
