@@ -10,9 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.coremedia.commerce.adapter.akeneo.repositories.CategoryRepositoryImpl.UNCLASSIFIED_CATEGORY_ID;
 
 @Service("akeneoProductsResource")
 public class ProductsResource extends AbstractAkeneoApiResource {
@@ -32,17 +35,21 @@ public class ProductsResource extends AbstractAkeneoApiResource {
 
   @Cacheable("productsInCategory")
   public List<ProductEntity> getProductsInCategory(String categoryCode) {
+    try {
+      Filter searchFilter;
+      if (UNCLASSIFIED_CATEGORY_ID.equals(categoryCode) || StringUtils.isBlank(categoryCode)) {
+        // Get unclassified products
+        searchFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.UNCLASSIFIED).build();
+      } else {
+        // Filter products by categories classification
+        searchFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.IN).withValue(List.of(categoryCode)).build();
+      }
+      return searchProducts(searchFilter);
 
-    Filter searchFilter;
-    if (StringUtils.isBlank(categoryCode)) {
-      // Get unclassified products
-      searchFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.UNCLASSIFIED).build();
-    } else {
-      // Filter products by categories classification
-      searchFilter = FilterBuilder.newInstance().onProperty("categories").withOperator(Filter.Operator.IN).withValue(List.of(categoryCode)).build();
+    } catch (Exception e) {
+      System.out.println(e);
+      return Collections.emptyList();
     }
-
-    return searchProducts(searchFilter);
   }
 
   public List<ProductEntity> searchProducts(Filter filter) {

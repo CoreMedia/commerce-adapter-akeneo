@@ -20,12 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.Executable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.coremedia.commerce.adapter.akeneo.api.utils.Filter.Operator.CONTAINS;
+import static com.coremedia.commerce.adapter.akeneo.repositories.CategoryRepositoryImpl.UNCLASSIFIED_CATEGORY_ID;
 import static java.lang.invoke.MethodHandles.lookup;
 
 @DefaultAnnotation(NonNull.class)
@@ -83,36 +86,43 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 
   private Product toProduct(ProductEntity productEntity, EntityQuery entityQuery) {
-    String productIdentifier = productEntity.getIdentifier();
-    ExternalId id = ExternalId.of(productIdentifier);
-    Locale locale = entityQuery.getLocale().orElse(defaultLocale);
-    String name = productEntity.getName();
+    try {
+      String productIdentifier = productEntity.getIdentifier();
+      ExternalId id = ExternalId.of(productIdentifier);
+      Locale locale = entityQuery.getLocale().orElse(defaultLocale);
+      String name = productEntity.getName();
 
+      String[] categories = productEntity.getCategories();
+      String parentCategoryCode = Arrays.stream(categories).findFirst().orElse(UNCLASSIFIED_CATEGORY_ID);
+      ExternalId parentCategoryId = ExternalId.of(parentCategoryCode);
+      ProductBuilder productBuilder = Product.builder(id, name, parentCategoryId);
 
-    String parentCode = Optional.ofNullable(productEntity.getFamily()).orElse("master");
-    ExternalId parentCategoryId = ExternalId.of(parentCode);
-    ProductBuilder productBuilder = Product.builder(id, name, parentCategoryId);
+      // Add currency
+      entityQuery.getCurrency().ifPresent(currency -> productBuilder.setCurrencyCode(currency.getCurrencyCode()));
 
-    // Add currency
-    entityQuery.getCurrency().ifPresent(currency -> productBuilder.setCurrencyCode(currency.getCurrencyCode()));
+      // Add description
+      productEntity.getLocalizedValue("description", locale, String.class)
+              .ifPresent(description -> {
+                productBuilder.setShortDescription(description);
+                productBuilder.setLongDescription(description);
+              });
 
-    // Add description
-    productEntity.getLocalizedValue("description", locale, String.class)
-            .ifPresent(description -> {
-              productBuilder.setShortDescription(description);
-              productBuilder.setLongDescription(description);
-            });
+      // Add Images
+      productEntity.getImage().ifPresent(imagePath -> {
+        productBuilder.setDefaultImageUrl(properties.getMediaEndpoint() + "/thumbnail_small/" + imagePath);
+        productBuilder.setThumbnailImageUrl(properties.getMediaEndpoint() + "/preview/" + imagePath);
+      });
 
-    // Add Images
-    productEntity.getImage().ifPresent(imagePath -> {
-      productBuilder.setDefaultImageUrl(properties.getMediaEndpoint() + "/thumbnail_small/" + imagePath);
-      productBuilder.setThumbnailImageUrl(properties.getMediaEndpoint() + "/preview/" + imagePath);
-    });
+      // TODO: Set parent/master product or variant ids
+      productEntity.getPrices();
 
-    // TODO: Set parent/master product or variant ids
-    productEntity.getPrices();
+      return productBuilder.build();
 
-    return productBuilder.build();
+    } catch (Exception e) {
+      LOG.error("Unable to create product:", e);
+      return null;
+    }
+
   }
 
 }

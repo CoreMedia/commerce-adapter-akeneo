@@ -17,11 +17,11 @@ public class AkeneoApiCacheConfiguration {
 
   @Bean
   public CacheManager cacheManager() {
-    CaffeineCache channelCache = buildCache("channels", 100,30);
-    CaffeineCache categoryCache = buildCache("categories", 100,5);
-    CaffeineCache childCategoriesCache = buildCache("childCategories", 100, 5);
-    CaffeineCache productCache = buildCache("products", 1000, 10);
-    CaffeineCache productsInCategoryCache = buildCache("productsInCategory", 1000, 10);
+    CaffeineCache channelCache = buildCache("channels", 100,24, TimeUnit.HOURS);
+    CaffeineCache categoryCache = buildCache("categories", 100,30, TimeUnit.MINUTES);
+    CaffeineCache childCategoriesCache = buildCache("childCategories", 100, 30, TimeUnit.MINUTES);
+    CaffeineCache productCache = buildCache("products", 1000, 24, TimeUnit.HOURS);
+    CaffeineCache productsInCategoryCache = buildCache("productsInCategory", 1000, 1, TimeUnit.HOURS);
 
     SimpleCacheManager manager = new SimpleCacheManager();
     manager.setCaches(Arrays.asList(channelCache, categoryCache, childCategoriesCache, productCache, productsInCategoryCache));
@@ -29,9 +29,9 @@ public class AkeneoApiCacheConfiguration {
     return manager;
   }
 
-  private CaffeineCache buildCache(String name, int capacity, int minutesToExpire) {
+  private CaffeineCache buildCache(String name, int capacity, long duration, TimeUnit timeUnit) {
     return new CaffeineCache(name, Caffeine.newBuilder()
-            .expireAfterWrite(minutesToExpire, TimeUnit.MINUTES)
+            .expireAfterWrite(duration, timeUnit)
             .maximumSize(capacity)
             .build());
   }

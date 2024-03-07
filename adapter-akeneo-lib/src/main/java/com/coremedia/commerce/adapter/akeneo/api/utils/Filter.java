@@ -68,7 +68,11 @@ public class Filter {
 
   public JSONObject asJSON() {
     JSONArray jsonArray = new JSONArray();
-    jsonArray.put(new JSONObject(Map.of("operator", operator.label, "value", value)));
+    if (value != null) {
+      jsonArray.put(new JSONObject(Map.of("operator", operator.label, "value", value)));
+    } else {
+      jsonArray.put(new JSONObject(Map.of("operator", operator.label)));
+    }
     JSONObject json = new JSONObject();
     json.put(property, jsonArray);
     return json;

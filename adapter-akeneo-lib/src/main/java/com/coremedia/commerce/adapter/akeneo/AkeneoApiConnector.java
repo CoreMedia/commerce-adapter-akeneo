@@ -39,7 +39,7 @@ public class AkeneoApiConnector {
 
   private final String protocol;
   private final String host;
-  private final String port;
+  private final int port;
   private final String basePath;
   private final String apiVersion;
   private final RestTemplate restTemplate;
@@ -139,8 +139,11 @@ public class AkeneoApiConnector {
       uriBuilder = UriComponentsBuilder.newInstance()
               .scheme(protocol)
               .host(host)
-              .port(port)
               .path(basePath);
+
+      if (port > 0) {
+        uriBuilder.port(port);
+      }
 
       // Append API version.
       String apiVersionPathSegment = apiVersion;
@@ -167,7 +170,7 @@ public class AkeneoApiConnector {
       T responseBody = responseEntity.getBody();
       return Optional.ofNullable(responseBody);
     } catch (HttpClientErrorException ex) {
-      LOG.trace("Call to '{}' with params '{}' raised exception.", url, urlParams, ex);
+      LOG.error("Call to '{}' with params '{}' raised exception.", url, urlParams, ex);
       HttpStatus statusCode = ex.getStatusCode();
       switch (statusCode) {
         case NOT_FOUND: {
@@ -181,7 +184,7 @@ public class AkeneoApiConnector {
           return Optional.ofNullable(responseEntity.getBody());
         }
         default: {
-          LOG.error("REST call to '{}' with params '{}' failed. Exception: {}", url, urlParams, ex.getMessage(), ex);
+          LOG.error("REST call to '{}' with params '{}' failed with status '{}'. Exception: {}", url, urlParams, statusCode, ex.getMessage(), ex);
           return Optional.empty();
         }
       }

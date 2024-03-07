@@ -49,7 +49,7 @@ public abstract class AbstractAkeneoApiResource {
     List<T> results = new ArrayList<>();
 
     ListMultimap<String, String> queryParams = ArrayListMultimap.create();
-    queryParams.put(LIMIT, DEFAULT_LIMIT);
+    queryParams.put(LIMIT, MAX_LIMIT);
 
     if (filter != null) {
       queryParams.put(SEARCH, filter.toString());

@@ -1,5 +1,6 @@
 package com.coremedia.commerce.adapter.akeneo.configuration;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,7 +22,7 @@ public class AkeneoApiConfigurationProperties {
   /**
    * The port used for REST communication with the commerce system.
    */
-  private String port = "";
+  private int port = 0;
 
   /**
    * The API base path.
@@ -58,11 +59,11 @@ public class AkeneoApiConfigurationProperties {
     this.host = host;
   }
 
-  public String getPort() {
+  public int getPort() {
     return port;
   }
 
-  public void setPort(String port) {
+  public void setPort(int port) {
     this.port = port;
   }
 
@@ -131,7 +132,16 @@ public class AkeneoApiConfigurationProperties {
   }
 
   public String getMediaEndpoint() {
-    return UriComponentsBuilder.newInstance().scheme(protocol).host(host).port(port).path(mediaCachePath).build().toString();
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+            .scheme(protocol)
+            .host(host)
+            .path(mediaCachePath);
+
+    if (port > 0) {
+      uriComponentsBuilder.port(port);
+    }
+
+    return uriComponentsBuilder.build().toString();
   }
 
 }

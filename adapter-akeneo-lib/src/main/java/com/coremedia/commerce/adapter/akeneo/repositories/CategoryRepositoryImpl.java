@@ -38,6 +38,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
   private static final Logger LOG = LoggerFactory.getLogger(lookup().lookupClass());
 
+  public static final String UNCLASSIFIED_CATEGORY_ID = "_unclassified";
+
   private final CategoriesResource categoriesResource;
   private final ProductsResource productsResource;
   private final Locale defaultLocale;
@@ -128,7 +130,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
       productIds.addAll(unclassifiedProductIds);
     }
 
-    categoryBuilder.setProductIds(new ArrayList<>(productIds));
+    // Sanitize product ids
+    List<Id> sanitizedProductIds = productIds.stream().filter(pid -> !pid.getValue().contains("/")).collect(Collectors.toList());
+    categoryBuilder.setProductIds(new ArrayList<>(sanitizedProductIds));
 
     return categoryBuilder.build();
   }
