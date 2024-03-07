@@ -26,7 +26,7 @@ public class ChannelsResourceIT extends AbstractAkeneoApiIT {
   private ChannelsResource channelsResource;
 
   @Test
-  public void testListCategories() {
+  public void testListChannels() {
     List<ChannelEntity> channelList = channelsResource.listChannels();
     assertNotNull(channelList);
     assertEquals("Expected number of channels does not match.", 5, channelList.size());
