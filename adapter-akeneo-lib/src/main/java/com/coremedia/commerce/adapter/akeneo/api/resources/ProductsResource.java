@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.coremedia.commerce.adapter.akeneo.repositories.CategoryRepositoryImpl.UNCLASSIFIED_CATEGORY_ID;
+import static com.coremedia.commerce.adapter.akeneo.api.resources.CategoriesResource.UNCLASSIFIED_CATEGORY_ID;
 
 @Service("akeneoProductsResource")
 public class ProductsResource extends AbstractAkeneoApiResource {

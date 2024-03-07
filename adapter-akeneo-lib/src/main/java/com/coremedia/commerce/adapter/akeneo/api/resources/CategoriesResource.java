@@ -20,14 +20,26 @@ public class CategoriesResource extends AbstractAkeneoApiResource {
   private static final String CATEGORIES_PATH = "/categories";
   private static final String CATEGORY_BY_CODE_PATH = CATEGORIES_PATH + "/{" + CODE_PARAM + "}";
 
+  public static final String UNCLASSIFIED_CATEGORY_ID = "_unclassified";
+
   public CategoriesResource(AkeneoApiConnector connector) {
     super(connector);
   }
 
   @Cacheable("categories")
   public Optional<CategoryEntity> getCategoryByCode(String code) {
-    Map<String, String> pathParameters = ImmutableMap.of(CODE_PARAM, code);
-    return connector.getResource(CATEGORY_BY_CODE_PATH, pathParameters, CategoryEntity.class);
+    Optional<CategoryEntity> category;
+
+    if (UNCLASSIFIED_CATEGORY_ID.equals(code)) {
+      Filter rootCatagoryFilter = FilterBuilder.newInstance().onProperty("is_root").withOperator(Filter.Operator.EQUALS).withValue(true).build();
+      List<CategoryEntity> categoryEntities = searchCategories(rootCatagoryFilter);
+      category = categoryEntities.stream().findFirst();
+    } else {
+      Map<String, String> pathParameters = ImmutableMap.of(CODE_PARAM, code);
+      category = connector.getResource(CATEGORY_BY_CODE_PATH, pathParameters, CategoryEntity.class);
+    }
+
+    return category;
   }
 
   public List<CategoryEntity> listCategories() {

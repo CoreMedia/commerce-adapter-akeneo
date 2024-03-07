@@ -27,8 +27,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.coremedia.commerce.adapter.akeneo.api.resources.CategoriesResource.UNCLASSIFIED_CATEGORY_ID;
 import static com.coremedia.commerce.adapter.akeneo.api.utils.Filter.Operator.CONTAINS;
-import static com.coremedia.commerce.adapter.akeneo.repositories.CategoryRepositoryImpl.UNCLASSIFIED_CATEGORY_ID;
 import static java.lang.invoke.MethodHandles.lookup;
 
 @DefaultAnnotation(NonNull.class)

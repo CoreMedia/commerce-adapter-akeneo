@@ -38,8 +38,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
   private static final Logger LOG = LoggerFactory.getLogger(lookup().lookupClass());
 
-  public static final String UNCLASSIFIED_CATEGORY_ID = "_unclassified";
-
   private final CategoriesResource categoriesResource;
   private final ProductsResource productsResource;
   private final Locale defaultLocale;
