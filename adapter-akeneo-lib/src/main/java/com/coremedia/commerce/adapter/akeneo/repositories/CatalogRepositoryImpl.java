@@ -62,7 +62,9 @@ public class CatalogRepositoryImpl implements CatalogRepository {
     ExternalId rootCategoryId = ExternalId.of(channelEntity.getCategoryTree());
     String name = channelEntity.getCode();
     CatalogBuilder catalogBuilder = Catalog.builder(id, name, rootCategoryId);
-    return catalogBuilder.build();
+    Catalog catalog = catalogBuilder.build();
+    LOG.info("Created catalog: {}", catalog);
+    return catalog;
   }
 
 }

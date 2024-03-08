@@ -20,14 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Executable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.coremedia.commerce.adapter.akeneo.api.resources.CategoriesResource.UNCLASSIFIED_CATEGORY_ID;
 import static com.coremedia.commerce.adapter.akeneo.api.utils.Filter.Operator.CONTAINS;
 import static java.lang.invoke.MethodHandles.lookup;
 
@@ -93,7 +91,7 @@ public class ProductRepositoryImpl implements ProductRepository {
       String name = productEntity.getName();
 
       String[] categories = productEntity.getCategories();
-      String parentCategoryCode = Arrays.stream(categories).findFirst().orElse(UNCLASSIFIED_CATEGORY_ID);
+      String parentCategoryCode = Arrays.stream(categories).findFirst().orElse("master"); // TODO: Get root category code for correct catalog (aka. channel)
       ExternalId parentCategoryId = ExternalId.of(parentCategoryCode);
       ProductBuilder productBuilder = Product.builder(id, name, parentCategoryId);
 

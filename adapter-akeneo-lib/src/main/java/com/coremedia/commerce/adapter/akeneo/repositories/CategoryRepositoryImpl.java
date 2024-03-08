@@ -4,6 +4,7 @@ package com.coremedia.commerce.adapter.akeneo.repositories;
 import com.coremedia.commerce.adapter.akeneo.api.entities.CategoryEntity;
 import com.coremedia.commerce.adapter.akeneo.api.entities.ProductEntity;
 import com.coremedia.commerce.adapter.akeneo.api.resources.CategoriesResource;
+import com.coremedia.commerce.adapter.akeneo.api.resources.ChannelsResource;
 import com.coremedia.commerce.adapter.akeneo.api.resources.ProductsResource;
 import com.coremedia.commerce.adapter.akeneo.configuration.AkeneoApiConfigurationProperties;
 import com.coremedia.commerce.adapter.base.entities.Category;
@@ -39,11 +40,15 @@ public class CategoryRepositoryImpl implements CategoryRepository {
   private static final Logger LOG = LoggerFactory.getLogger(lookup().lookupClass());
 
   private final CategoriesResource categoriesResource;
+
+  private final ChannelsResource channelsResource;
+
   private final ProductsResource productsResource;
   private final Locale defaultLocale;
 
   public CategoryRepositoryImpl(CategoriesResource categoriesResource, ProductsResource productsResource, AkeneoApiConfigurationProperties properties) {
     this.categoriesResource = categoriesResource;
+    this.channelsResource = null;
     this.productsResource = productsResource;
     this.defaultLocale = properties.getDefaultLocale();
   }
@@ -129,9 +134,14 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     // Sanitize product ids
-    List<Id> sanitizedProductIds = productIds.stream().filter(pid -> !pid.getValue().contains("/")).collect(Collectors.toList());
+    List<Id> sanitizedProductIds = productIds.stream().filter(pid -> !pid.getValue().contains("/"))
+            .limit(10) // TODO: Remove after development
+            .collect(Collectors.toList());
+
     categoryBuilder.setProductIds(new ArrayList<>(sanitizedProductIds));
 
-    return categoryBuilder.build();
+    Category category = categoryBuilder.build();
+    LOG.info("Created category: {}", category);
+    return category;
   }
 }
