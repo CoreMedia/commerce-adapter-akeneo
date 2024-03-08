@@ -135,7 +135,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     // Sanitize product ids
     List<Id> sanitizedProductIds = productIds.stream().filter(pid -> !pid.getValue().contains("/"))
-            .limit(10) // TODO: Remove after development
             .collect(Collectors.toList());
 
     categoryBuilder.setProductIds(new ArrayList<>(sanitizedProductIds));
