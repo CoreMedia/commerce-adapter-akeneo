@@ -102,12 +102,14 @@ public class AkeneoAuthenticator implements ClientHttpRequestInterceptor {
   }
 
   private String buildAuthenticationUrl(AkeneoApiConfigurationProperties properties) {
-    return UriComponentsBuilder.newInstance()
+    UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
             .scheme(properties.getProtocol())
             .host(properties.getHost())
-            .port(properties.getPort())
-            .path(OAUTH_TOKEN_PATH)
-            .build().toString();
+            .path(OAUTH_TOKEN_PATH);
+    if (properties.getPort() > 0) {
+      builder.port(properties.getPort());
+    }
+    return builder.build().toString();
   }
 
 }
