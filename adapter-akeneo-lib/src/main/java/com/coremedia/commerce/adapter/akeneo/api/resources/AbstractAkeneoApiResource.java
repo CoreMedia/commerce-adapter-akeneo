@@ -42,17 +42,21 @@ public abstract class AbstractAkeneoApiResource {
   }
 
   protected <S extends PaginatedEntity<T>, T extends AbstractEntity> List<T> performSearch(String resourcePath, Class<S> paginationType) {
-    return performSearch(resourcePath, null, paginationType);
+    return performSearch(resourcePath, "", paginationType);
   }
 
   protected <S extends PaginatedEntity<T>, T extends AbstractEntity> List<T> performSearch(String resourcePath, Filter filter, Class<S> paginationType) {
+    return performSearch(resourcePath, filter.toString(), paginationType);
+  }
+
+  protected <S extends PaginatedEntity<T>, T extends AbstractEntity> List<T> performSearch(String resourcePath, String filterQuery, Class<S> paginationType) {
     List<T> results = new ArrayList<>();
 
     ListMultimap<String, String> queryParams = ArrayListMultimap.create();
     queryParams.put(LIMIT, MAX_LIMIT);
 
-    if (filter != null) {
-      queryParams.put(SEARCH, filter.toString());
+    if (StringUtils.isNotBlank(filterQuery)) {
+      queryParams.put(SEARCH, filterQuery);
     }
 
     // initial request

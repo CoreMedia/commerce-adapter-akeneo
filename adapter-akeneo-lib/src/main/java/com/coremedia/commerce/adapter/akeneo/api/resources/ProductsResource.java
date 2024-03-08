@@ -64,4 +64,8 @@ public class ProductsResource extends AbstractAkeneoApiResource {
     return performSearch(PRODUCTS_PATH, filter, PaginatedProductsEntity.class);
   }
 
+  public List<ProductEntity> searchProducts(String rawFilter) {
+    return performSearch(PRODUCTS_PATH, rawFilter, PaginatedProductsEntity.class);
+  }
+
 }

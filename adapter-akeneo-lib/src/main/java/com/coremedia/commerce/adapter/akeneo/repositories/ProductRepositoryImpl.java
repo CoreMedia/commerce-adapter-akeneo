@@ -65,7 +65,7 @@ public class ProductRepositoryImpl implements ProductRepository {
   @Override
   public SearchResult search(SearchQuery searchQuery) {
     LOG.debug("Searching products for search query: {}", searchQuery);
-    Filter searchFilter = FilterBuilder.newInstance().onProperty("name").withOperator(CONTAINS).withValue(searchQuery.getSearchTerm()).build();
+    Filter searchFilter = FilterBuilder.newInstance().onProperty("identifier").withOperator(CONTAINS).withValue(searchQuery.getSearchTerm()).build();
     List<ProductEntity> productEntities = productsResource.searchProducts(searchFilter);
     List<Id> productIds = productEntities.stream()
             .map(ProductEntity::getIdentifier)
