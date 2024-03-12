@@ -118,6 +118,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     // Add subcategory ids
     List<Id> childIds = categoriesResource.getChildCategories(categoryCode).stream()
             .map(CategoryEntity::getCode)
+            .sorted()
             .map(ExternalId::of)
             .collect(Collectors.toList());
     categoryBuilder.setChildIds(childIds);
