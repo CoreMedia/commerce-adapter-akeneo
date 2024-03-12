@@ -1,6 +1,7 @@
 package com.coremedia.commerce.adapter.akeneo.api.resources;
 
 import com.coremedia.commerce.adapter.akeneo.AkeneoApiConnector;
+import com.coremedia.commerce.adapter.akeneo.api.entities.CategoryEntity;
 import com.coremedia.commerce.adapter.akeneo.api.entities.ChannelEntity;
 import com.coremedia.commerce.adapter.akeneo.api.entities.PaginatedChannelsEntity;
 import com.google.common.collect.ImmutableMap;
@@ -27,12 +28,13 @@ public class ChannelsResource extends AbstractAkeneoApiResource {
     super(connector);
   }
 
-  @Cacheable("channels")
+  @Cacheable(value = "channels", key = "#code")
   public Optional<ChannelEntity> getChannelByCode(String code) {
     Map<String, String> pathParameters = ImmutableMap.of(CODE_PARAM, code);
     return connector.getResource(CHANNEL_BY_CODE_PATH, pathParameters, ChannelEntity.class);
   }
 
+  @Cacheable("channels_list")
   public List<ChannelEntity> listChannels() {
     return performSearch(CHANNELS_PATH, PaginatedChannelsEntity.class);
   }

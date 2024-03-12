@@ -27,7 +27,7 @@ public class CategoriesResourceIT extends AbstractAkeneoApiIT {
 
   @Test
   public void testGetRootCategory() {
-    Optional<CategoryEntity> master = categoriesResource.getCategoryByCode("master");
+    Optional<CategoryEntity> master = categoriesResource.getCategoryByCode("master", "Catalog");
     assertTrue(master.isPresent());
   }
 

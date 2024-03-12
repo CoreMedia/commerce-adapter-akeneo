@@ -170,7 +170,7 @@ public class AkeneoApiConnector {
       T responseBody = responseEntity.getBody();
       return Optional.ofNullable(responseBody);
     } catch (HttpClientErrorException ex) {
-      LOG.error("Call to '{}' with params '{}' raised exception.", url, urlParams, ex);
+      LOG.error("Call to '{}' with params '{}' raised exception.", url, urlParams);
       HttpStatus statusCode = ex.getStatusCode();
       switch (statusCode) {
         case NOT_FOUND: {
@@ -184,7 +184,7 @@ public class AkeneoApiConnector {
           return Optional.ofNullable(responseEntity.getBody());
         }
         default: {
-          LOG.error("REST call to '{}' with params '{}' failed with status '{}'. Exception: {}", url, urlParams, statusCode, ex.getMessage(), ex);
+          LOG.error("REST call to '{}' with params '{}' failed with status '{}'. Exception: {}", url, urlParams, statusCode, ex.getMessage());
           return Optional.empty();
         }
       }

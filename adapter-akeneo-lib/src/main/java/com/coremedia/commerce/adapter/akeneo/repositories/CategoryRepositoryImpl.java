@@ -14,6 +14,7 @@ import com.coremedia.commerce.adapter.base.entities.EntityQuery;
 import com.coremedia.commerce.adapter.base.entities.ExternalId;
 import com.coremedia.commerce.adapter.base.entities.Id;
 import com.coremedia.commerce.adapter.base.entities.IdQuery;
+import com.coremedia.commerce.adapter.base.entities.NonBlankStringValueObject;
 import com.coremedia.commerce.adapter.base.entities.SeoSegmentQuery;
 import com.coremedia.commerce.adapter.base.repositories.CategoryRepository;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -56,7 +57,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
   @Override
   public Optional<Category> getCategoryById(IdQuery idQuery) {
     LOG.debug("Fetching category by id query: {}", idQuery);
-    Optional<Category> category = categoriesResource.getCategoryByCode(idQuery.getId().getValue())
+    String categoryCode = idQuery.getId().getValue();
+    String channelCode = idQuery.getCatalogId().map(NonBlankStringValueObject::getValue).orElse(null);
+    Optional<Category> category = categoriesResource.getCategoryByCode(categoryCode, channelCode)
             .map(entity -> toCategory(entity, idQuery));
     if (LOG.isDebugEnabled()) {
       if (category.isPresent()) {
@@ -71,7 +74,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
   @Override
   public Optional<Category> getCategoryBySeoSegment(SeoSegmentQuery seoSegmentQuery) {
     LOG.debug("Fetching category by seo segment query: {}", seoSegmentQuery);
-    Optional<Category> category = categoriesResource.getCategoryByCode(seoSegmentQuery.getSeoSegment())
+    String seoSegment = seoSegmentQuery.getSeoSegment();
+    String channelCode = seoSegmentQuery.getCatalogId().map(NonBlankStringValueObject::getValue).orElse(null);
+    Optional<Category> category = categoriesResource.getCategoryByCode(seoSegment, channelCode)
             .map(entity -> toCategory(entity, seoSegmentQuery));
     if (LOG.isDebugEnabled()) {
       if (category.isPresent()) {
@@ -123,7 +128,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
             .map(ExternalId::of)
             .collect(Collectors.toSet());
 
-    if (StringUtils.isBlank(categoryEntity.getParent())) {
+    /*if (StringUtils.isBlank(categoryEntity.getParent())) {
       // no parent category so also add all unclassified products to this root category
       Set<Id> unclassifiedProductIds = productsResource.getProductsInCategory(null).stream()
               .map(ProductEntity::getIdentifier)
@@ -131,7 +136,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
               .collect(Collectors.toSet());
 
       productIds.addAll(unclassifiedProductIds);
-    }
+    }*/
 
     // Sanitize product ids
     List<Id> sanitizedProductIds = productIds.stream().filter(pid -> !pid.getValue().contains("/"))

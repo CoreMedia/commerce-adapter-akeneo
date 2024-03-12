@@ -18,13 +18,14 @@ public class AkeneoApiCacheConfiguration {
   @Bean
   public CacheManager cacheManager() {
     CaffeineCache channelCache = buildCache("channels", 100,24, TimeUnit.HOURS);
+    CaffeineCache channelListCache = buildCache("channels_list", 100,1, TimeUnit.HOURS);
     CaffeineCache categoryCache = buildCache("categories", 100,30, TimeUnit.MINUTES);
     CaffeineCache childCategoriesCache = buildCache("childCategories", 100, 30, TimeUnit.MINUTES);
-    CaffeineCache productCache = buildCache("products", 1000, 24, TimeUnit.HOURS);
+    CaffeineCache productCache = buildCache("products", 2000, 24, TimeUnit.HOURS);
     CaffeineCache productsInCategoryCache = buildCache("productsInCategory", 1000, 1, TimeUnit.HOURS);
 
     SimpleCacheManager manager = new SimpleCacheManager();
-    manager.setCaches(Arrays.asList(channelCache, categoryCache, childCategoriesCache, productCache, productsInCategoryCache));
+    manager.setCaches(Arrays.asList(channelCache, channelListCache, categoryCache, childCategoriesCache, productCache, productsInCategoryCache));
 
     return manager;
   }

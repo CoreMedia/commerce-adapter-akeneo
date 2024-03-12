@@ -43,6 +43,8 @@ public class AkeneoApiConfigurationProperties {
 
   private String mediaCachePath = "/media/cache";
 
+  private AkeneoEntityAttributeMapping entityAttributeMapping;
+
   public String getProtocol() {
     return protocol;
   }
@@ -144,4 +146,11 @@ public class AkeneoApiConfigurationProperties {
     return uriComponentsBuilder.build().toString();
   }
 
+  public AkeneoEntityAttributeMapping getEntityAttributeMapping() {
+    return entityAttributeMapping;
+  }
+
+  public void setEntityAttributeMapping(AkeneoEntityAttributeMapping entityAttributeMapping) {
+    this.entityAttributeMapping = entityAttributeMapping;
+  }
 }

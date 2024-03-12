@@ -35,13 +35,13 @@ public class ProductsResource extends AbstractAkeneoApiResource {
     this.catalogApiUtil = catalogApiUtil;
   }
 
-  @Cacheable("products")
+  @Cacheable(value = "products", key = "#code")
   public Optional<ProductEntity> getProductByCode(String code) {
     Map<String, String> pathParameters = ImmutableMap.of(CODE_PARAM, code);
     return connector.getResource(PRODUCT_BY_CODE_PATH, pathParameters, ProductEntity.class);
   }
 
-  @Cacheable("productsInCategory")
+  @Cacheable(value = "productsInCategory", key = "#categoryCode")
   public List<ProductEntity> getProductsInCategory(String categoryCode) {
     try {
       Filter searchFilter;
