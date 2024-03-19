@@ -1,7 +1,8 @@
 package com.coremedia.commerce.adapter.akeneo.configuration;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
+/**
+ * Attribute mappings for products.
+ */
 public class AkeneoEntityAttributeMapping {
 
   private ProductEntityMapping product;
@@ -22,6 +23,7 @@ public class AkeneoEntityAttributeMapping {
     String longDescription;
     String metaDescription;
     String metaKeywords;
+    String thumbnailUrl;
 
     public String getName() {
       return name;
@@ -77,6 +79,14 @@ public class AkeneoEntityAttributeMapping {
 
     public void setMetaKeywords(String metaKeywords) {
       this.metaKeywords = metaKeywords;
+    }
+
+    public String getThumbnailUrl() {
+      return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+      this.thumbnailUrl = thumbnailUrl;
     }
   }
 
