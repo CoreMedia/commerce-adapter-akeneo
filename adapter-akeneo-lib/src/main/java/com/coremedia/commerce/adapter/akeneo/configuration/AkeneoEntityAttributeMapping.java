@@ -24,6 +24,7 @@ public class AkeneoEntityAttributeMapping {
     String metaDescription;
     String metaKeywords;
     String thumbnailUrl;
+    String defaultImageUrl;
 
     public String getName() {
       return name;
@@ -87,6 +88,14 @@ public class AkeneoEntityAttributeMapping {
 
     public void setThumbnailUrl(String thumbnailUrl) {
       this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public String getDefaultImageUrl() {
+      return defaultImageUrl;
+    }
+
+    public void setDefaultImageUrl(String defaultImageUrl) {
+      this.defaultImageUrl = defaultImageUrl;
     }
   }
 

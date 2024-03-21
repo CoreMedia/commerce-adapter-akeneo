@@ -136,11 +136,23 @@ public class ProductRepositoryImpl implements ProductRepository {
       // Add long description
       localizedLongDescription.ifPresent(productBuilder::setLongDescription);
 
-      // Add Images
+      // Add Images (defaults)
       productEntity.getImage().ifPresent(imagePath -> {
         productBuilder.setDefaultImageUrl(properties.getMediaEndpoint() + "/thumbnail_small/" + imagePath);
         productBuilder.setThumbnailImageUrl(properties.getMediaEndpoint() + "/preview/" + imagePath);
       });
+
+      // Default image url
+      getEntityAttribute(productEntity,
+              properties.getEntityAttributeMapping().getProduct().getDefaultImageUrl(),
+              locale, String.class)
+              .ifPresent(productBuilder::setDefaultImageUrl);
+
+      // Thumbnail url
+      getEntityAttribute(productEntity,
+              properties.getEntityAttributeMapping().getProduct().getThumbnailUrl(),
+              locale, String.class)
+              .ifPresent(productBuilder::setThumbnailImageUrl);
 
       // TODO: Set parent/master product or variant ids
       productEntity.getPrices();
@@ -152,6 +164,17 @@ public class ProductRepositoryImpl implements ProductRepository {
       return null;
     }
 
+  }
+
+  private <T> Optional<T> getEntityAttribute(ProductEntity productEntity, String attributeName, Locale locale, Class<T> resultType) {
+    Optional<T> result = Optional.empty();
+    if (StringUtils.isNotBlank(attributeName)) {
+      result = productEntity.getLocalizedValue(attributeName, locale, resultType);
+      if (result.isEmpty()) {
+        result = productEntity.getValueForKey(attributeName, resultType);
+      }
+    }
+    return result;
   }
 
   private <T> Optional<T> getEntityAttributeWithFallback(ProductEntity productEntity, String attributeName, Locale locale, T fallback, Class<T> resultType) {
